@@ -1,6 +1,6 @@
 package br.com.ifba.ecociclo.modulos.associacao.model;
 
-import br.com.ifba.ecociclo.infraestructure.model.Endereco;
+import br.com.ifba.ecociclo.modulos.endereco.model.Endereco;
 import br.com.ifba.ecociclo.infraestructure.model.PersistenceEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

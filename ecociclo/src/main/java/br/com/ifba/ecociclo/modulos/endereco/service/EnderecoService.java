@@ -1,6 +1,6 @@
 package br.com.ifba.ecociclo.modulos.endereco.service;
 
-import br.com.ifba.ecociclo.infraestructure.model.Endereco;
+import br.com.ifba.ecociclo.modulos.endereco.model.Endereco;
 import br.com.ifba.ecociclo.modulos.endereco.dto.request.EnderecoRequestDTO;
 import br.com.ifba.ecociclo.modulos.endereco.dto.response.EnderecoResponseDTO;
 import br.com.ifba.ecociclo.modulos.endereco.repository.EnderecoRepository;

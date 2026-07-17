@@ -20,7 +20,8 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable()) // Desabilita proteção CSRF temporariamente para testes
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/usuarios/**").permitAll()
-                .requestMatchers("/api/enderecos/**").permitAll() // Libera os endpoints de endereços
+                .requestMatchers("/api/enderecos/**").permitAll()
+                .requestMatchers("/api/doacoes/**").permitAll() // Libera os endpoints de doações
                 .anyRequest().authenticated()
             );
         return http.build();

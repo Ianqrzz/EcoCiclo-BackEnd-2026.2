@@ -1,5 +1,6 @@
 package br.com.ifba.ecociclo.modulos.agendamento.model;
 
+import br.com.ifba.ecociclo.modulos.endereco.model.Endereco;
 import br.com.ifba.ecociclo.infraestructure.model.PersistenceEntity;
 import br.com.ifba.ecociclo.modulos.agendamento.enums.StatusAgendamento;
 import br.com.ifba.ecociclo.modulos.coletor.model.Coletor;
@@ -43,8 +44,12 @@ public class Agendamento extends PersistenceEntity {
     @JoinColumn(name = "coletor_id")
     private Coletor coletor;
 
-    @OneToOne
-    @JoinColumn(name = "doacao_id")
+    @ManyToOne
+    @JoinColumn(name = "endereco_id", nullable = false)
+    private Endereco endereco;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "doacao_id", nullable = false)
     private Doacao doacao;
 
 }
