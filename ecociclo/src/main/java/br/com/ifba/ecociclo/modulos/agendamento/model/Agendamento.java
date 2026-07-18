@@ -1,8 +1,9 @@
 package br.com.ifba.ecociclo.modulos.agendamento.model;
 
+import br.com.ifba.ecociclo.modulos.agendamento.enums.StatusAgendamento;
 import br.com.ifba.ecociclo.modulos.endereco.model.Endereco;
 import br.com.ifba.ecociclo.infraestructure.model.PersistenceEntity;
-import br.com.ifba.ecociclo.modulos.agendamento.enums.StatusAgendamento;
+
 import br.com.ifba.ecociclo.modulos.coletor.model.Coletor;
 import br.com.ifba.ecociclo.modulos.doacao.model.Doacao;
 import br.com.ifba.ecociclo.modulos.doador.model.Doador;
