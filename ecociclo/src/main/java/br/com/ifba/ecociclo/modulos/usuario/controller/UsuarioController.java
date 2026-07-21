@@ -1,6 +1,7 @@
 package br.com.ifba.ecociclo.modulos.usuario.controller;
 
 import br.com.ifba.ecociclo.infraestructure.security.TokenService;
+import br.com.ifba.ecociclo.modulos.endereco.dto.request.EnderecoRequestDTO;
 import br.com.ifba.ecociclo.modulos.usuario.dto.request.CadastroRequestDTO;
 import br.com.ifba.ecociclo.modulos.usuario.dto.request.UsuarioUpdateRequestDTO;
 import br.com.ifba.ecociclo.modulos.usuario.dto.response.UsuarioResponseDTO;
@@ -46,6 +47,12 @@ public class UsuarioController {
         return ResponseEntity.status(HttpStatus.CREATED).body(usuarioService.salvar(dto));
     }
 
+    @PostMapping("/{id}/enderecos")
+    public ResponseEntity<UsuarioResponseDTO> adicionarEndereco(@PathVariable UUID id,
+                                                                @RequestBody EnderecoRequestDTO dto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(usuarioService.adicionarEndereco(id, dto));
+    }
+
     @GetMapping
     public ResponseEntity<List<UsuarioResponseDTO>> listarTodos() {
         return ResponseEntity.ok(usuarioService.listarTodos());
@@ -56,16 +63,21 @@ public class UsuarioController {
         return ResponseEntity.ok(usuarioService.buscarPorId(id));
     }
 
-    
+
 
     @GetMapping("/me")
-    public ResponseEntity<UsuarioResponseDTO> obterUsuarioLogado() {
+    public ResponseEntity<?> obterUsuarioLogado() {
         // Pega as informações do usuário que o Spring Security validou através do Token
         var authentication = SecurityContextHolder.getContext().getAuthentication();
-        var usuarioLogado = (Usuario) authentication.getPrincipal();
 
-        // Usa o serviço que você já tem para buscar o usuário pelo ID e retornar como DTO
-        return ResponseEntity.ok(usuarioService.buscarPorId(usuarioLogado.getId()));
+        if (authentication != null && authentication.getPrincipal() instanceof Usuario) {
+            var usuarioLogado = (Usuario) authentication.getPrincipal();
+            // Usa o serviço que você já tem para buscar o usuário pelo ID e retornar como DTO
+            return ResponseEntity.ok(usuarioService.buscarPorId(usuarioLogado.getId()));
+        }
+
+        // Retorna 401 em vez de estourar Erro 500 no servidor
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Sessão inválida ou não autenticada.");
     }
 
     @PutMapping("/{id}")

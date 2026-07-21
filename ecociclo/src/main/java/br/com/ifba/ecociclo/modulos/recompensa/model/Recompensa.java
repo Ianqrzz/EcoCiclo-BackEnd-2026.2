@@ -22,6 +22,7 @@ public class Recompensa extends PersistenceEntity {
     @Column(nullable = false)
     private String nome;
 
+    @Column(nullable = false)
     private int quantidade;
 
     private String imagem;
@@ -29,10 +30,13 @@ public class Recompensa extends PersistenceEntity {
     @Column(length = 500)
     private String descricao;
 
+    @Column(nullable = false)
     private double custoPontos;
 
+    @Column(nullable = false)
     private boolean disponivel;
 
+    @Column(nullable = false)
     private int bloqueado;
 
 }

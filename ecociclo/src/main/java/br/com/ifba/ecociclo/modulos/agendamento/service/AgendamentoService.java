@@ -108,8 +108,34 @@ public class AgendamentoService {
 
     @Transactional
     public List<AgendamentoResponseDTO> listarPendentes() {
-        return agendamentoRepository.findAll().stream()
-                .filter(a -> a.getStatus() == StatusAgendamento.PENDENTE)
+        return listarAgendamentos(StatusAgendamento.PENDENTE, null);
+    }
+
+    @Transactional
+    public List<AgendamentoResponseDTO> listarPorColetor(UUID coletorId) {
+        if (coletorId == null) {
+            throw new RuntimeException("Coletor não informado");
+        }
+        return agendamentoRepository.findByColetor_Id(coletorId).stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public List<AgendamentoResponseDTO> listarAgendamentos(StatusAgendamento status, UUID coletorId) {
+        List<Agendamento> agendamentos;
+
+        if (status != null && coletorId != null) {
+            agendamentos = agendamentoRepository.findByStatusAndColetor_Id(status, coletorId);
+        } else if (status != null) {
+            agendamentos = agendamentoRepository.findByStatus(status);
+        } else if (coletorId != null) {
+            agendamentos = agendamentoRepository.findByColetor_Id(coletorId);
+        } else {
+            agendamentos = agendamentoRepository.findAll();
+        }
+
+        return agendamentos.stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }

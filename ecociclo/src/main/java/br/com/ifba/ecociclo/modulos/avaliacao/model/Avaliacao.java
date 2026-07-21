@@ -20,14 +20,16 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode(callSuper = true)
 public class Avaliacao extends PersistenceEntity {
 
+    @Column(nullable = false)
     private int nota;
     
     @Column(length = 500)
     private String comentario;
     
+    @Column(nullable = false)
     private LocalDateTime data;
 
-    @OneToOne
+    @OneToOne(optional = false)
     @JoinColumn(name = "agendamento_id")
     private Agendamento agendamento;
 

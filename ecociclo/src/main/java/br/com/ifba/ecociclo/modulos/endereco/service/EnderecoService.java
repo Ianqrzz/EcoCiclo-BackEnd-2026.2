@@ -4,6 +4,8 @@ import br.com.ifba.ecociclo.modulos.endereco.model.Endereco;
 import br.com.ifba.ecociclo.modulos.endereco.dto.request.EnderecoRequestDTO;
 import br.com.ifba.ecociclo.modulos.endereco.dto.response.EnderecoResponseDTO;
 import br.com.ifba.ecociclo.modulos.endereco.repository.EnderecoRepository;
+import br.com.ifba.ecociclo.modulos.usuario.model.Usuario;
+import br.com.ifba.ecociclo.modulos.usuario.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +19,7 @@ import java.util.stream.Collectors;
 public class EnderecoService {
 
     private final EnderecoRepository enderecoRepository;
+    private final UsuarioRepository usuarioRepository;
 
     @Transactional
     public EnderecoResponseDTO salvar(EnderecoRequestDTO dto) {
@@ -27,7 +30,16 @@ public class EnderecoService {
                 .estado(dto.estado())
                 .cep(dto.cep())
                 .build();
-        return mapToResponse(enderecoRepository.save(endereco));
+
+        if (dto.usuarioId() == null) {
+            throw new RuntimeException("usuarioId é obrigatório para vincular o endereço ao perfil.");
+        }
+
+        Usuario usuario = usuarioRepository.findById(dto.usuarioId())
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
+        usuario.adicionarEndereco(endereco);
+        usuarioRepository.save(usuario);
+        return mapToResponse(endereco);
     }
 
     @Transactional(readOnly = true)
@@ -74,6 +86,7 @@ public class EnderecoService {
                 .cidade(endereco.getCidade())
                 .estado(endereco.getEstado())
                 .cep(endereco.getCep())
+                .usuarioId(endereco.getUsuario() != null ? endereco.getUsuario().getId() : null)
                 .build();
     }
 }
