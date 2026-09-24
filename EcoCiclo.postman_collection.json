@@ -1,0 +1,898 @@
+{
+  "info": {
+    "name": "EcoCiclo API",
+    "_postman_id": "ecociclo-api-v1",
+    "description": "EcoCiclo Backend — ambiente de testes local.\n\nAdmin padrao: admin@ecociclo.com / password\n\nExecute a pasta Auth primeiro. O token e os IDs sao salvos automaticamente nas variaveis da colecao.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl",       "value": "http://localhost:8080", "type": "string" },
+    { "key": "token",         "value": "",                      "type": "string" },
+    { "key": "usuarioId",     "value": "",                      "type": "string" },
+    { "key": "doadorId",      "value": "",                      "type": "string" },
+    { "key": "coletorId",     "value": "",                      "type": "string" },
+    { "key": "enderecoId",    "value": "",                      "type": "string" },
+    { "key": "associacaoId",  "value": "",                      "type": "string" },
+    { "key": "doacaoId",      "value": "",                      "type": "string" },
+    { "key": "agendamentoId", "value": "",                      "type": "string" },
+    { "key": "avaliacaoId",   "value": "",                      "type": "string" },
+    { "key": "recompensaId",  "value": "",                      "type": "string" },
+    { "key": "resgateId",     "value": "",                      "type": "string" }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "const res = pm.response.json();",
+                  "if (res.token) {",
+                  "    pm.collectionVariables.set(\"token\", res.token);",
+                  "    console.log(\"Token salvo:\", res.token.substring(0, 20) + \"...\");",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@ecociclo.com\",\n  \"senha\": \"password\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/usuarios/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "usuarios", "login"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Usuarios",
+      "item": [
+        {
+          "name": "Criar Doador",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.response.to.have.status(201));",
+                  "const res = pm.response.json();",
+                  "if (res.id) {",
+                  "    pm.collectionVariables.set(\"usuarioId\", res.id);",
+                  "    pm.collectionVariables.set(\"doadorId\", res.id);",
+                  "    console.log(\"doadorId salvo:\", res.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Joao Silva\",\n  \"cpf\": \"12345678901\",\n  \"telefone\": \"71999990001\",\n  \"email\": \"joao.doador@email.com\",\n  \"senha\": \"Senha@123\",\n  \"perfil\": \"DOADOR\",\n  \"endereco\": {\n    \"logradouro\": \"Rua das Flores, 100\",\n    \"bairro\": \"Centro\",\n    \"cidade\": \"Feira de Santana\",\n    \"estado\": \"BA\",\n    \"cep\": \"44001-000\"\n  }\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/usuarios",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "usuarios"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Criar Coletor",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.response.to.have.status(201));",
+                  "const res = pm.response.json();",
+                  "if (res.id) {",
+                  "    pm.collectionVariables.set(\"coletorId\", res.id);",
+                  "    console.log(\"coletorId salvo:\", res.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Maria Coletora\",\n  \"cpf\": \"98765432100\",\n  \"telefone\": \"71999990002\",\n  \"email\": \"maria.coletora@email.com\",\n  \"senha\": \"Senha@123\",\n  \"perfil\": \"COLETOR\",\n  \"endereco\": {\n    \"logradouro\": \"Av. Principal, 200\",\n    \"bairro\": \"Jardim\",\n    \"cidade\": \"Feira de Santana\",\n    \"estado\": \"BA\",\n    \"cep\": \"44002-000\"\n  }\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/usuarios",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "usuarios"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar Todos",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/usuarios",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "usuarios"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar por ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/usuarios/{{usuarioId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "usuarios", "{{usuarioId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Usuario Logado (me)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/usuarios/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "usuarios", "me"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Atualizar",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Joao Silva Atualizado\",\n  \"telefone\": \"71988880001\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/usuarios/{{usuarioId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "usuarios", "{{usuarioId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Adicionar Endereco",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"logradouro\": \"Rua Secundaria, 50\",\n  \"bairro\": \"Vila Nova\",\n  \"cidade\": \"Feira de Santana\",\n  \"estado\": \"BA\",\n  \"cep\": \"44003-000\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/usuarios/{{usuarioId}}/enderecos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "usuarios", "{{usuarioId}}", "enderecos"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Deletar",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/api/usuarios/{{usuarioId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "usuarios", "{{usuarioId}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Enderecos",
+      "item": [
+        {
+          "name": "Criar",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.response.to.have.status(201));",
+                  "const res = pm.response.json();",
+                  "if (res.id) {",
+                  "    pm.collectionVariables.set(\"enderecoId\", res.id);",
+                  "    console.log(\"enderecoId salvo:\", res.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"logradouro\": \"Rua da Coleta, 300\",\n  \"bairro\": \"Industrial\",\n  \"cidade\": \"Feira de Santana\",\n  \"estado\": \"BA\",\n  \"cep\": \"44010-000\",\n  \"usuarioId\": \"{{doadorId}}\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/enderecos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "enderecos"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar Todos",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/enderecos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "enderecos"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar por ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/enderecos/{{enderecoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "enderecos", "{{enderecoId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Atualizar",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"logradouro\": \"Rua da Coleta, 301\",\n  \"bairro\": \"Industrial\",\n  \"cidade\": \"Feira de Santana\",\n  \"estado\": \"BA\",\n  \"cep\": \"44010-000\",\n  \"usuarioId\": \"{{doadorId}}\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/enderecos/{{enderecoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "enderecos", "{{enderecoId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Deletar",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/api/enderecos/{{enderecoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "enderecos", "{{enderecoId}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Associacoes",
+      "item": [
+        {
+          "name": "Criar",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.response.to.have.status(201));",
+                  "const res = pm.response.json();",
+                  "if (res.id) {",
+                  "    pm.collectionVariables.set(\"associacaoId\", res.id);",
+                  "    console.log(\"associacaoId salvo:\", res.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Associacao Verde Limpa\",\n  \"cnpj\": \"12345678000190\",\n  \"endereco\": {\n    \"logradouro\": \"Av. Ecologica, 500\",\n    \"bairro\": \"Parque Verde\",\n    \"cidade\": \"Feira de Santana\",\n    \"estado\": \"BA\",\n    \"cep\": \"44020-000\"\n  }\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/associacoes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "associacoes"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar Todas",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/associacoes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "associacoes"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar por ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/associacoes/{{associacaoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "associacoes", "{{associacaoId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Atualizar",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Associacao Verde Limpa Atualizada\",\n  \"cnpj\": \"12345678000190\",\n  \"endereco\": {\n    \"logradouro\": \"Av. Ecologica, 501\",\n    \"bairro\": \"Parque Verde\",\n    \"cidade\": \"Feira de Santana\",\n    \"estado\": \"BA\",\n    \"cep\": \"44020-000\"\n  }\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/associacoes/{{associacaoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "associacoes", "{{associacaoId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar Coletores Disponiveis",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/associacoes/coletores",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "associacoes", "coletores"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Adicionar Coletor",
+          "request": {
+            "method": "PUT",
+            "url": {
+              "raw": "{{baseUrl}}/api/associacoes/{{associacaoId}}/coletores/{{coletorId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "associacoes", "{{associacaoId}}", "coletores", "{{coletorId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar Membros",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/associacoes/{{associacaoId}}/membros",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "associacoes", "{{associacaoId}}", "membros"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Deletar",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/api/associacoes/{{associacaoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "associacoes", "{{associacaoId}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Doacoes",
+      "item": [
+        {
+          "name": "Criar",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.response.to.have.status(201));",
+                  "const res = pm.response.json();",
+                  "if (res.id) {",
+                  "    pm.collectionVariables.set(\"doacaoId\", res.id);",
+                  "    console.log(\"doacaoId salvo:\", res.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Garrafas PET\",\n  \"quantidade\": 20,\n  \"peso\": 3.5,\n  \"imagem\": \"https://exemplo.com/imagem.jpg\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/doacoes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "doacoes"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar Todas",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/doacoes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "doacoes"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar por ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/doacoes/{{doacaoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "doacoes", "{{doacaoId}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Agendamentos",
+      "item": [
+        {
+          "name": "Criar",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.response.to.have.status(201));",
+                  "const res = pm.response.json();",
+                  "if (res.id) {",
+                  "    pm.collectionVariables.set(\"agendamentoId\", res.id);",
+                  "    console.log(\"agendamentoId salvo:\", res.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"doadorId\": \"{{doadorId}}\",\n  \"enderecoId\": \"{{enderecoId}}\",\n  \"dataColeta\": \"2026-10-15T10:00:00\",\n  \"observacoes\": \"Deixar na portaria\",\n  \"doacao\": {\n    \"nome\": \"Papelao e Plastico\",\n    \"quantidade\": 10,\n    \"peso\": 5.0,\n    \"imagem\": \"https://exemplo.com/residuos.jpg\"\n  }\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/agendamentos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "agendamentos"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar Pendentes",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/agendamentos/pendentes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "agendamentos", "pendentes"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar por Coletor",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/agendamentos/coletor/{{coletorId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "agendamentos", "coletor", "{{coletorId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar com Filtros",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/agendamentos?status=PENDENTE",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "agendamentos"],
+              "query": [
+                { "key": "status",    "value": "PENDENTE" },
+                { "key": "coletorId", "value": "", "disabled": true }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Aceitar Coleta",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"coletorId\": \"{{coletorId}}\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/agendamentos/{{agendamentoId}}/aceitar",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "agendamentos", "{{agendamentoId}}", "aceitar"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Concluir Coleta",
+          "request": {
+            "method": "PUT",
+            "url": {
+              "raw": "{{baseUrl}}/api/agendamentos/{{agendamentoId}}/concluir",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "agendamentos", "{{agendamentoId}}", "concluir"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cancelar Coleta",
+          "request": {
+            "method": "PUT",
+            "url": {
+              "raw": "{{baseUrl}}/api/agendamentos/{{agendamentoId}}/cancelar",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "agendamentos", "{{agendamentoId}}", "cancelar"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Avaliacoes",
+      "item": [
+        {
+          "name": "Criar",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.response.to.have.status(201));",
+                  "const res = pm.response.json();",
+                  "if (res.id) {",
+                  "    pm.collectionVariables.set(\"avaliacaoId\", res.id);",
+                  "    console.log(\"avaliacaoId salvo:\", res.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nota\": 5,\n  \"comentario\": \"Excelente servico, muito pontual!\",\n  \"agendamentoId\": \"{{agendamentoId}}\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/avaliacoes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "avaliacoes"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar Todas",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/avaliacoes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "avaliacoes"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar por ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/avaliacoes/{{avaliacaoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "avaliacoes", "{{avaliacaoId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Atualizar",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nota\": 4,\n  \"comentario\": \"Bom servico, mas demorou um pouco.\",\n  \"agendamentoId\": \"{{agendamentoId}}\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/avaliacoes/{{avaliacaoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "avaliacoes", "{{avaliacaoId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Deletar",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/api/avaliacoes/{{avaliacaoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "avaliacoes", "{{avaliacaoId}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Recompensas",
+      "item": [
+        {
+          "name": "Criar",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.response.to.have.status(201));",
+                  "const res = pm.response.json();",
+                  "if (res.id) {",
+                  "    pm.collectionVariables.set(\"recompensaId\", res.id);",
+                  "    console.log(\"recompensaId salvo:\", res.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Vale Desconto 10%\",\n  \"descricao\": \"Desconto de 10% em parceiros EcoCiclo\",\n  \"custoPontos\": 150.0,\n  \"quantidade\": 50,\n  \"imagem\": \"https://exemplo.com/voucher.jpg\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/recompensas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "recompensas"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar Todas",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/recompensas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "recompensas"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar por ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/recompensas/{{recompensaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "recompensas", "{{recompensaId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Atualizar",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Vale Desconto 15%\",\n  \"descricao\": \"Desconto de 15% em parceiros EcoCiclo\",\n  \"custoPontos\": 200.0,\n  \"quantidade\": 30,\n  \"imagem\": \"https://exemplo.com/voucher.jpg\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/recompensas/{{recompensaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "recompensas", "{{recompensaId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Resgatar Recompensa",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.id) {",
+                  "    pm.collectionVariables.set(\"resgateId\", res.id);",
+                  "    console.log(\"resgateId salvo:\", res.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"doadorId\": \"{{doadorId}}\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/recompensas/{{recompensaId}}/resgatar",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "recompensas", "{{recompensaId}}", "resgatar"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Confirmar Retirada",
+          "request": {
+            "method": "PATCH",
+            "url": {
+              "raw": "{{baseUrl}}/api/recompensas/resgates/{{resgateId}}/confirmar-retirada",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "recompensas", "resgates", "{{resgateId}}", "confirmar-retirada"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Deletar",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/api/recompensas/{{recompensaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "recompensas", "{{recompensaId}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Resgates",
+      "item": [
+        {
+          "name": "Listar com Filtros",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/resgates?doadorId={{doadorId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "resgates"],
+              "query": [
+                { "key": "doadorId", "value": "{{doadorId}}" },
+                { "key": "status",   "value": "PENDENTE", "disabled": true }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar Pendentes",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/resgates/pendentes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "resgates", "pendentes"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar por ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/resgates/{{resgateId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "resgates", "{{resgateId}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
