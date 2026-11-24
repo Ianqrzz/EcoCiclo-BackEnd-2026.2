@@ -1,4 +1,7 @@
--- Senha padrão: Admin@123
+-- Usuario administrador inicial (APENAS para desenvolvimento local).
+-- Senha padrao: Admin@123  (hash BCrypt, custo 10, conferido em DataSqlSenhaAdminTest)
+-- Em producao/staging, troque a senha apos o primeiro login.
+
 INSERT INTO tb_usuarios (id, nome, cpf, telefone, email, senha, perfil)
 VALUES (
     'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
@@ -6,7 +9,7 @@ VALUES (
     '00000000000',
     NULL,
     'admin@ecociclo.com',
-    '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+    '$2a$10$zBf311bjvT45Fc3A4fMYDehYppzTA89OqtZa7S0/E9ucKBCY21602',
     'ADMINISTRADOR'
 ) ON CONFLICT DO NOTHING;
 
