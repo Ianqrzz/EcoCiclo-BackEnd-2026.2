@@ -6,7 +6,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
-
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
@@ -82,5 +82,35 @@ class TokenServiceTest {
 
         TokenService service = new TokenService(SECRET, Duration.ofHours(2), Clock.systemUTC());
         assertThat(service.getSubject(tokenAntigo)).isEmpty();
+    }
+
+    // ---------- Issue #7: segredo obrigatório e forte ----------
+
+    @Test
+    void naoDeveIniciarSemSegredo() {
+        assertThatThrownBy(() -> new TokenService("", Duration.ofHours(2), Clock.systemUTC()))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("API_SECURITY_TOKEN_SECRET");
+
+        assertThatThrownBy(() -> new TokenService(null, Duration.ofHours(2), Clock.systemUTC()))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    void naoDeveIniciarComSegredoFraco() {
+        String antigaChavePadrao = "chave-secreta-padrao-ecociclo"; // 29 bytes
+
+        assertThatThrownBy(() -> new TokenService(antigaChavePadrao, Duration.ofHours(2), Clock.systemUTC()))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("fraco");
+    }
+
+    @Test
+    void tokenAssinadoComOutroSegredoEhRejeitado() {
+        TokenService atacante = new TokenService("outro-segredo-qualquer-com-32-bytes-ou-mais", Duration.ofHours(2), Clock.systemUTC());
+        String tokenForjado = atacante.gerarToken(usuario());
+
+        TokenService api = new TokenService(SECRET, Duration.ofHours(2), Clock.systemUTC());
+        assertThat(api.getSubject(tokenForjado)).isEmpty();
     }
 }

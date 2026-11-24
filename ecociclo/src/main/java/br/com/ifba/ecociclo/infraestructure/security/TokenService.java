@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.nio.charset.StandardCharsets;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
@@ -20,25 +21,32 @@ import java.time.Instant;
  * com {@link Instant}, que representa um ponto absoluto na linha do tempo (UTC).
  * Assim o resultado é o mesmo na máquina do desenvolvedor (America/Bahia) e no
  * container Docker (UTC), sem depender do fuso horário da JVM.</p>
+ *
+ * <p>O segredo de assinatura é obrigatório e deve vir da variável de ambiente
+ * {@code API_SECURITY_TOKEN_SECRET}. Não existe valor padrão no código: se o
+ * segredo estiver ausente ou fraco, a aplicação não inicia.</p>
  */
 @Service
 public class TokenService {
 
     static final String ISSUER = "EcoCiclo_API";
 
-    private final String secret;
+    /** O HMAC-SHA256 recomenda chave de no mínimo 256 bits (32 bytes). */
+    static final int TAMANHO_MINIMO_SEGREDO_BYTES = 32;
+
+    private final Algorithm algorithm;
     private final Duration expiracao;
     private final Clock clock;
 
     /**
      * Construtor usado pelo Spring.
      *
-     * @param secret    chave de assinatura HMAC (a chave padrão será removida na issue #7)
+     * @param secret    chave de assinatura HMAC, lida de {@code API_SECURITY_TOKEN_SECRET}
      * @param expiracao validade do token; aceita formatos como {@code 2h}, {@code 30m} ou {@code PT2H}
      */
     @Autowired
     public TokenService(
-            @Value("${api.security.token.secret:chave-secreta-padrao-ecociclo}") String secret,
+            @Value("${api.security.token.secret:}") String secret,
             @Value("${api.security.token.expiration:2h}") Duration expiracao) {
         this(secret, expiracao, Clock.systemUTC());
     }
@@ -47,9 +55,26 @@ public class TokenService {
      * Construtor para testes: permite fixar o relógio e verificar as datas com precisão.
      */
     TokenService(String secret, Duration expiracao, Clock clock) {
-        this.secret = secret;
+        validarSegredo(secret);
+        this.algorithm = Algorithm.HMAC256(secret); // criado uma única vez
         this.expiracao = expiracao;
         this.clock = clock;
+    }
+
+    /**
+     * Impede a aplicação de subir com segredo ausente ou fraco (fail-fast).
+     */
+    private static void validarSegredo(String secret) {
+        if (secret == null || secret.isBlank()) {
+            throw new IllegalStateException(
+                    "Segredo JWT não configurado. Defina a variável de ambiente API_SECURITY_TOKEN_SECRET.");
+        }
+        int tamanho = secret.getBytes(StandardCharsets.UTF_8).length;
+        if (tamanho < TAMANHO_MINIMO_SEGREDO_BYTES) {
+            throw new IllegalStateException(
+                    "Segredo JWT fraco: possui " + tamanho + " bytes, o mínimo é "
+                            + TAMANHO_MINIMO_SEGREDO_BYTES + ". Gere um com: openssl rand -base64 32");
+        }
     }
 
     public String gerarToken(Usuario usuario) {
@@ -60,7 +85,7 @@ public class TokenService {
                     .withSubject(usuario.getEmail())
                     .withIssuedAt(agora)
                     .withExpiresAt(agora.plus(expiracao))
-                    .sign(algoritmo());
+                    .sign(algorithm);
         } catch (JWTCreationException exception) {
             throw new RuntimeException("Erro ao gerar token jwt", exception);
         }
@@ -68,7 +93,7 @@ public class TokenService {
 
     public String getSubject(String tokenJWT) {
         try {
-            return JWT.require(algoritmo())
+            return JWT.require(algorithm)
                     .withIssuer(ISSUER)
                     .build()
                     .verify(tokenJWT)
@@ -76,9 +101,5 @@ public class TokenService {
         } catch (JWTVerificationException exception) {
             return ""; // Token inválido ou expirado (tratamento será padronizado nas issues de exceções)
         }
-    }
-
-    private Algorithm algoritmo() {
-        return Algorithm.HMAC256(secret);
     }
 }
