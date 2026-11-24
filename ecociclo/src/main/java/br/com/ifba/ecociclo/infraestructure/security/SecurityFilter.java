@@ -17,6 +17,8 @@ import java.io.IOException;
 @Component
 public class SecurityFilter extends OncePerRequestFilter {
 
+    private static final String PREFIXO_BEARER = "Bearer ";
+
     @Autowired
     private TokenService tokenService;
 
@@ -45,10 +47,22 @@ public class SecurityFilter extends OncePerRequestFilter {
     }
 
     private String recuperarToken(HttpServletRequest request) {
-        var authorizationHeader = request.getHeader("Authorization");
-        if (authorizationHeader != null) {
-            return authorizationHeader.replace("Bearer ", "");
+        return extrairToken(request.getHeader("Authorization"));
+    }
+
+    /**
+     * Extrai o token de um cabeçalho no formato {@code Authorization: Bearer <token>}.
+     *
+     * <p>Retorna {@code null} quando o cabeçalho está ausente, usa outro esquema
+     * (ex.: {@code Basic}), não tem o prefixo {@code Bearer} ou vem sem token.
+     * O nome do esquema é comparado sem diferenciar maiúsculas (RFC 6750).</p>
+     */
+    static String extrairToken(String authorizationHeader) {
+        if (authorizationHeader == null
+                || !authorizationHeader.regionMatches(true, 0, PREFIXO_BEARER, 0, PREFIXO_BEARER.length())) {
+            return null;
         }
-        return null;
+        String token = authorizationHeader.substring(PREFIXO_BEARER.length()).trim();
+        return token.isEmpty() ? null : token;
     }
 }
