@@ -72,8 +72,18 @@ _Adicionar aqui as tarefas das próximas sprints conforme o planejamento estrat�
 
 Achados registrados fora do escopo atual. Devem virar issue com a label `precisa-revisao`.
 
-| ID | Tarefa | Tipo de manutenção | Gravidade | Responsável | Issue | Status |
-|---|---|---|---|---|---|---|
-| BL-01 | Conferir senha do admin em `data.sql`: o comentário diz `Admin@123`, mas o hash aparenta ser de outra senha | corretiva | média | | [#15](https://github.com/Ianqrzz/EcoCiclo-BackEnd-2026.2/issues/15) | ⬜ |
-| BL-02 | Adicionar Bean Validation (`@NotBlank`, `@Email` etc.) nos DTOs de request e `@Valid` nos controllers | preventiva | média | | [#16](https://github.com/Ianqrzz/EcoCiclo-BackEnd-2026.2/issues/16) | ⬜ |
-| BL-03 | Corrigir `recuperarToken` do `SecurityFilter` para aceitar apenas cabeçalho no formato `Bearer <token>` | corretiva | baixa | | [#17](https://github.com/Ianqrzz/EcoCiclo-BackEnd-2026.2/issues/17) | ⬜ |
+| ID    | Tarefa | Tipo de manutenção | Gravidade | Responsável | Issue                                                               | Status |
+|-------|---|--------------------|-----------|---|---------------------------------------------------------------------|---|
+| BL-01 | Conferir senha do admin em `data.sql`: o comentário diz `Admin@123`, mas o hash aparenta ser de outra senha | corretiva          | média     | | [#15](https://github.com/Ianqrzz/EcoCiclo-BackEnd-2026.2/issues/15) | ⬜ |
+| BL-02 | Adicionar Bean Validation (`@NotBlank`, `@Email` etc.) nos DTOs de request e `@Valid` nos controllers | preventiva         | média     | | [#16](https://github.com/Ianqrzz/EcoCiclo-BackEnd-2026.2/issues/16) | ⬜ |
+| BL-03 | Corrigir `recuperarToken` do `SecurityFilter` para aceitar apenas cabeçalho no formato `Bearer <token>` | corretiva          | baixa     | | [#17](https://github.com/Ianqrzz/EcoCiclo-BackEnd-2026.2/issues/17) | ⬜ |
+| BL-04 | Datas gravadas com LocalDateTime.now() ficam 3h adiantadas no Docker | corretiva          | media     | | [#19](https://github.com/Ianqrzz/EcoCiclo-BackEnd-2026.2/issues/19) | ⬜ |
+| BL-05 | 	@CrossOrigin("*") nos 4 controllers | corretiva          | media     | | [#20](https://github.com/Ianqrzz/EcoCiclo-BackEnd-2026.2/issues/20) | ⬜ |
+| BL-06 | Injeção de dependência por campo | perfectiva         | baixa     | | [#21](https://github.com/Ianqrzz/EcoCiclo-BackEnd-2026.2/issues/21) | ⬜ |
+| BL-07 | 	Collectors.toList() em vez de toList() | perfectiva         | baixa     | | [#22](https://github.com/Ianqrzz/EcoCiclo-BackEnd-2026.2/issues/22) | ⬜ |
+| BL-08 | @Transactional chamado via this | perfectiva         | baixa     | | [#23](https://github.com/Ianqrzz/EcoCiclo-BackEnd-2026.2/issues/23) | ⬜ |
+| BL-09 | Projeto não compila em JDK 23+.| adaptativa         | media     | | [#24](https://github.com/Ianqrzz/EcoCiclo-BackEnd-2026.2/issues/24) | ⬜ |
+
+
+
+
