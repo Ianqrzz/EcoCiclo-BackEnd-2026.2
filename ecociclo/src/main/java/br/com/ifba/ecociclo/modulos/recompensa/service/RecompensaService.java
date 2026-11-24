@@ -1,6 +1,7 @@
 package br.com.ifba.ecociclo.modulos.recompensa.service;
 
 import br.com.ifba.ecociclo.modulos.doador.model.Doador;
+import br.com.ifba.ecociclo.infraestructure.security.SecurityActor;
 import br.com.ifba.ecociclo.modulos.doador.repository.DoadorRepository;
 import br.com.ifba.ecociclo.modulos.recompensa.dto.request.RecompensaRequestDTO;
 import br.com.ifba.ecociclo.modulos.recompensa.dto.response.RecompensaResponseDTO;
@@ -29,6 +30,7 @@ public class RecompensaService {
 
     @Transactional
     public RecompensaResponseDTO salvar(RecompensaRequestDTO dto) {
+        SecurityActor.requireAdmin();
         validarCamposObrigatorios(dto.nome(), dto.quantidade(), dto.custoPontos());
 
         Recompensa recompensa = Recompensa.builder()
@@ -60,6 +62,7 @@ public class RecompensaService {
 
     @Transactional
     public RecompensaResponseDTO atualizar(UUID id, RecompensaRequestDTO dto) {
+        SecurityActor.requireAdmin();
         Recompensa recompensa = recompensaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Recompensa não encontrada com o ID: " + id));
 
@@ -91,6 +94,7 @@ public class RecompensaService {
 
     @Transactional
     public void deletar(UUID id) {
+        SecurityActor.requireAdmin();
         Recompensa recompensa = recompensaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Recompensa não encontrada com o ID: " + id));
 
@@ -106,6 +110,11 @@ public class RecompensaService {
 
     @Transactional
     public ResgateResponseDTO resgatar(UUID recompensaId, UUID doadorId) {
+        SecurityActor.requireSelfOrAdmin(doadorId);
+        // Só contas de doador podem fazer resgates.
+        if (!(SecurityActor.current() instanceof Doador)) {
+            throw new org.springframework.security.access.AccessDeniedException("Somente doadores podem resgatar recompensas.");
+        }
         Recompensa recompensa = recompensaRepository.findById(recompensaId)
                 .orElseThrow(() -> new RuntimeException("Recompensa não encontrada com o ID: " + recompensaId));
         Doador doador = doadorRepository.findById(doadorId)
@@ -142,6 +151,7 @@ public class RecompensaService {
     public ResgateResponseDTO confirmarRetirada(UUID resgateId) {
         Resgate resgate = resgateRepository.findById(resgateId)
                 .orElseThrow(() -> new RuntimeException("Resgate não encontrado com o ID: " + resgateId));
+        SecurityActor.requireAdmin();
 
         if (resgate.getStatus() != StatusResgate.PENDENTE) {
             throw new RuntimeException("Só é possível confirmar retiradas de resgates pendentes.");

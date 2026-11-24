@@ -6,6 +6,7 @@ import br.com.ifba.ecociclo.modulos.endereco.dto.response.EnderecoResponseDTO;
 import br.com.ifba.ecociclo.modulos.endereco.repository.EnderecoRepository;
 import br.com.ifba.ecociclo.modulos.usuario.model.Usuario;
 import br.com.ifba.ecociclo.modulos.usuario.repository.UsuarioRepository;
+import br.com.ifba.ecociclo.infraestructure.security.SecurityActor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +24,7 @@ public class EnderecoService {
 
     @Transactional
     public EnderecoResponseDTO salvar(EnderecoRequestDTO dto) {
+        SecurityActor.requireSelfOrAdmin(dto.usuarioId());
         Endereco endereco = Endereco.builder()
                 .logradouro(dto.logradouro())
                 .bairro(dto.bairro())
@@ -38,12 +40,13 @@ public class EnderecoService {
         Usuario usuario = usuarioRepository.findById(dto.usuarioId())
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
         usuario.adicionarEndereco(endereco);
-        usuarioRepository.save(usuario);
+        endereco = enderecoRepository.save(endereco);
         return mapToResponse(endereco);
     }
 
     @Transactional(readOnly = true)
     public List<EnderecoResponseDTO> listarTodos() {
+        SecurityActor.requireAdmin();
         return enderecoRepository.findAll().stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
@@ -53,6 +56,7 @@ public class EnderecoService {
     public EnderecoResponseDTO buscarPorId(UUID id) {
         Endereco endereco = enderecoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Endereço não encontrado."));
+        SecurityActor.requireSelfOrAdmin(endereco.getUsuario() == null ? null : endereco.getUsuario().getId());
         return mapToResponse(endereco);
     }
 
@@ -60,7 +64,8 @@ public class EnderecoService {
     public EnderecoResponseDTO atualizar(UUID id, EnderecoRequestDTO dto) {
         Endereco endereco = enderecoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Endereço não encontrado."));
-        
+        SecurityActor.requireSelfOrAdmin(endereco.getUsuario() == null ? null : endereco.getUsuario().getId());
+
         if (dto.logradouro() != null && !dto.logradouro().isBlank()) endereco.setLogradouro(dto.logradouro());
         if (dto.bairro() != null && !dto.bairro().isBlank()) endereco.setBairro(dto.bairro());
         if (dto.cidade() != null && !dto.cidade().isBlank()) endereco.setCidade(dto.cidade());
@@ -72,10 +77,10 @@ public class EnderecoService {
 
     @Transactional
     public void deletar(UUID id) {
-        if (!enderecoRepository.existsById(id)) {
-            throw new RuntimeException("Endereço não encontrado.");
-        }
-        enderecoRepository.deleteById(id);
+        Endereco endereco = enderecoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Endereço não encontrado."));
+        SecurityActor.requireSelfOrAdmin(endereco.getUsuario() == null ? null : endereco.getUsuario().getId());
+        enderecoRepository.delete(endereco);
     }
 
     private EnderecoResponseDTO mapToResponse(Endereco endereco) {

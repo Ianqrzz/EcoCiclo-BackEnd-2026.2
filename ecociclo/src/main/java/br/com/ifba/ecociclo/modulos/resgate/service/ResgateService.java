@@ -4,6 +4,7 @@ import br.com.ifba.ecociclo.modulos.resgate.dto.response.ResgateResponseDTO;
 import br.com.ifba.ecociclo.modulos.resgate.enums.StatusResgate;
 import br.com.ifba.ecociclo.modulos.resgate.model.Resgate;
 import br.com.ifba.ecociclo.modulos.resgate.repository.ResgateRepository;
+import br.com.ifba.ecociclo.infraestructure.security.SecurityActor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +21,7 @@ public class ResgateService {
 
     @Transactional(readOnly = true)
     public List<ResgateResponseDTO> listarTodos() {
+        SecurityActor.requireAdmin();
         return resgateRepository.findAll().stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
@@ -29,11 +31,13 @@ public class ResgateService {
     public ResgateResponseDTO buscarPorId(UUID id) {
         Resgate resgate = resgateRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Resgate não encontrado com o ID: " + id));
+        SecurityActor.requireSelfOrAdmin(resgate.getDoador().getId());
         return mapToResponse(resgate);
     }
 
     @Transactional(readOnly = true)
     public List<ResgateResponseDTO> listarPorDoador(UUID doadorId) {
+        SecurityActor.requireSelfOrAdmin(doadorId);
         return resgateRepository.findByDoador_Id(doadorId).stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
@@ -41,6 +45,7 @@ public class ResgateService {
 
     @Transactional(readOnly = true)
     public List<ResgateResponseDTO> listarPorStatus(StatusResgate status) {
+        SecurityActor.requireAdmin();
         return resgateRepository.findByStatus(status).stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
@@ -48,6 +53,7 @@ public class ResgateService {
 
     @Transactional(readOnly = true)
     public List<ResgateResponseDTO> listarPorDoadorEStatus(UUID doadorId, StatusResgate status) {
+        SecurityActor.requireSelfOrAdmin(doadorId);
         return resgateRepository.findByDoador_IdAndStatus(doadorId, status).stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());

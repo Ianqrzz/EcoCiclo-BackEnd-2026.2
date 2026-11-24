@@ -12,6 +12,7 @@ import br.com.ifba.ecociclo.modulos.usuario.dto.request.UsuarioUpdateRequestDTO;
 import br.com.ifba.ecociclo.modulos.usuario.dto.response.UsuarioResponseDTO;
 import br.com.ifba.ecociclo.modulos.usuario.model.Usuario;
 import br.com.ifba.ecociclo.modulos.usuario.repository.UsuarioRepository;
+import br.com.ifba.ecociclo.infraestructure.security.SecurityActor;
 import br.com.ifba.ecociclo.modulos.endereco.dto.request.EnderecoRequestDTO;
 import br.com.ifba.ecociclo.modulos.endereco.dto.response.EnderecoResponseDTO;
 import br.com.ifba.ecociclo.modulos.endereco.model.Endereco;
@@ -36,6 +37,10 @@ public class UsuarioService {
 
     @Transactional
     public UsuarioResponseDTO salvar(CadastroRequestDTO dto) {
+        // O cadastro público não pode criar uma conta de administrador.
+        if (dto.perfil() == br.com.ifba.ecociclo.modulos.usuario.enums.TipoPerfil.ADMINISTRADOR) {
+            SecurityActor.requireAdmin();
+        }
         String senhaCriptografada = passwordEncoder.encode(dto.senha());
         Usuario usuarioSalvo;
 
@@ -101,6 +106,7 @@ public class UsuarioService {
 
     @Transactional
     public UsuarioResponseDTO adicionarEndereco(UUID usuarioId, EnderecoRequestDTO enderecoDto) {
+        SecurityActor.requireSelfOrAdmin(usuarioId);
         Usuario usuario = usuarioRepository.findById(usuarioId)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
 
@@ -122,6 +128,7 @@ public class UsuarioService {
 
     @Transactional(readOnly = true)
     public List<UsuarioResponseDTO> listarTodos() {
+        SecurityActor.requireAdmin();
         return usuarioRepository.findAll().stream()
                 .map(this::converterParaResponse)
                 .collect(Collectors.toList());
@@ -129,6 +136,7 @@ public class UsuarioService {
 
     @Transactional(readOnly = true)
     public UsuarioResponseDTO buscarPorId(UUID id) {
+        SecurityActor.requireSelfOrAdmin(id);
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
         return converterParaResponse(usuario);
@@ -136,6 +144,7 @@ public class UsuarioService {
 
     @Transactional
     public UsuarioResponseDTO atualizar(UUID id, UsuarioUpdateRequestDTO dto) {
+        SecurityActor.requireSelfOrAdmin(id);
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
 
@@ -151,6 +160,7 @@ public class UsuarioService {
 
     @Transactional
     public void deletar(UUID id) {
+        SecurityActor.requireSelfOrAdmin(id);
         if (!usuarioRepository.existsById(id)) {
             throw new RuntimeException("Usuário não encontrado.");
         }
