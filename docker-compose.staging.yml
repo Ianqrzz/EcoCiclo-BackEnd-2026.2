@@ -1,0 +1,49 @@
+services:
+  # Ambiente separado usado nas verificações locais.
+  staging-db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: ${STAGING_DB_NAME:-ecociclo_staging}
+      POSTGRES_USER: ${STAGING_DB_USER:-ecociclo_staging}
+      POSTGRES_PASSWORD: ${STAGING_DB_PASSWORD:-staging_local_only}
+    ports:
+      - "${STAGING_DB_PORT:-55432}:5432"
+    volumes:
+      - staging_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      SPRING_PROFILES_ACTIVE: staging
+      SERVER_PORT: 8080
+      DB_URL: jdbc:postgresql://staging-db:5432/${STAGING_DB_NAME:-ecociclo_staging}
+      DB_USER: ${STAGING_DB_USER:-ecociclo_staging}
+      DB_PASSWORD: ${STAGING_DB_PASSWORD:-staging_local_only}
+      JWT_SECRET: ${STAGING_JWT_SECRET:-local-staging-secret-change-before-sharing-0123456789}
+    ports:
+      - "${STAGING_APP_PORT:-8081}:8080"
+    depends_on:
+      staging-db:
+        condition: service_healthy
+
+  zap:
+    image: ghcr.io/zaproxy/zaproxy:stable
+    profiles: ["dast"]
+    depends_on:
+      app:
+        condition: service_started
+    volumes:
+      - ./ecociclo/security/dast:/zap/wrk:ro
+      - ./ecociclo/security/dast/reports:/zap/reports
+    entrypoint: ["zap-api-scan.py"]
+    command: ["-t", "/zap/wrk/openapi.yaml", "-f", "openapi", "-c", "/zap/wrk/zap-rules.tsv", "-l", "WARN", "-J", "/zap/reports/zap-report.json", "-r", "/zap/reports/zap-report.html"]
+
+volumes:
+  staging_postgres_data:
