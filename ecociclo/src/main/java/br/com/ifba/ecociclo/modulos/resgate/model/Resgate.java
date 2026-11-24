@@ -5,21 +5,18 @@ import br.com.ifba.ecociclo.modulos.doador.model.Doador;
 import br.com.ifba.ecociclo.modulos.recompensa.model.Recompensa;
 import br.com.ifba.ecociclo.modulos.resgate.enums.StatusResgate;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "tb_resgates")
-@Data
+@Getter
+@Setter
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
 public class Resgate extends PersistenceEntity {
 
     private LocalDateTime data;
