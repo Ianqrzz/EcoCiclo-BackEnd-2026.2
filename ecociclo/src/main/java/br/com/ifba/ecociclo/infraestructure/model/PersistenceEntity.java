@@ -5,11 +5,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
 import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.Hibernate;
 
 import java.io.Serializable;
 import java.util.UUID;
@@ -21,7 +20,20 @@ import java.util.UUID;
 public class PersistenceEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @EqualsAndHashCode.Include @ToString.Include
     @Getter
     private UUID id;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof PersistenceEntity outra)) return false;
+        return Hibernate.getClass(this) == Hibernate.getClass(outra)
+                && getId() != null
+                && getId().equals(outra.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Hibernate.getClass(this).hashCode();
+    }
 }

@@ -4,11 +4,7 @@ import br.com.ifba.ecociclo.infraestructure.model.Pessoa;
 import br.com.ifba.ecociclo.modulos.endereco.model.Endereco;
 import br.com.ifba.ecociclo.modulos.usuario.enums.TipoPerfil;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -21,11 +17,11 @@ import java.util.List;
 @Entity
 @Table(name = "tb_usuarios")
 @Inheritance(strategy = InheritanceType.JOINED)
-@Data
+@Getter
+@Setter
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
 public abstract class Usuario extends Pessoa implements UserDetails, java.io.Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -41,8 +37,7 @@ public abstract class Usuario extends Pessoa implements UserDetails, java.io.Ser
     private TipoPerfil perfil;
 
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
+    @Builder.Default
     private List<Endereco> enderecos = new ArrayList<>();
 
     public void adicionarEndereco(Endereco endereco) {
