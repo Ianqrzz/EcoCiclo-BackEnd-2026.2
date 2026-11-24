@@ -1,0 +1,13 @@
+# Use this workspace to collaborate
+workspace:
+  id: beeff757-02e9-4281-8939-b2e85d291a7e
+
+localResources:
+  collections:
+    - ../EcoCiclo API
+
+# Each entry here maps a local resource to one or more corresponding objects in Postman Cloud
+
+cloudResources:
+  collections:
+    ../EcoCiclo API: ecociclo-api-v1
