@@ -1,0 +1,13 @@
+# ZAP API scan rules: rule ID, action, and optional comment (tab-separated).
+# No findings are suppressed before scan evidence confirms a specific false positive.
+10015	WARN	Cache-control headers still require review for sensitive API responses.
+40012	FAIL	Cross-site scripting reflected.
+40014	FAIL	Cross-site scripting persistent.
+40016	FAIL	Cross-site scripting persistent prime.
+40017	FAIL	Cross-site scripting persistent spider.
+40026	IGNORE	DOM-based XSS is a client-side browser rule; this OpenAPI scan targets REST API responses.
+40018	FAIL	SQL injection.
+40019	FAIL	SQL injection MySQL.
+40020	FAIL	SQL injection HSQLDB.
+40021	FAIL	SQL injection Oracle.
+40022	FAIL	SQL injection PostgreSQL.

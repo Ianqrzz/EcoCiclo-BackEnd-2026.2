@@ -1,0 +1,77 @@
+openapi: 3.0.3
+# Lista as rotas que o ZAP usa na varredura.
+info:
+  title: EcoCiclo API DAST entry points
+  version: 1.0.0
+servers:
+  - url: http://app:8080
+paths:
+  /api/usuarios/login:
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email: { type: string, example: zap@example.invalid }
+                senha: { type: string, example: InvalidPass123! }
+      responses:
+        '200': { description: Authenticated }
+        '401': { description: Invalid credentials }
+  /api/usuarios:
+    get:
+      security: [{ bearerAuth: [] }]
+      responses: { '200': { description: User collection } }
+  /api/usuarios/{id}:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      security: [{ bearerAuth: [] }]
+      responses: { '200': { description: User details } }
+    put:
+      security: [{ bearerAuth: [] }]
+      responses: { '200': { description: User updated } }
+    delete:
+      security: [{ bearerAuth: [] }]
+      responses: { '204': { description: User deleted } }
+  /api/doacoes:
+    get:
+      security: [{ bearerAuth: [] }]
+      responses: { '200': { description: Donations } }
+  /api/doacoes/{id}:
+    get:
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      responses: { '200': { description: Donation details } }
+  /api/agendamentos:
+    get:
+      security: [{ bearerAuth: [] }]
+      responses: { '200': { description: Collection appointments } }
+  /api/recompensas:
+    get:
+      security: [{ bearerAuth: [] }]
+      responses: { '200': { description: Rewards } }
+  /api/recompensas/{id}/resgatar:
+    post:
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      responses: { '200': { description: Reward redemption } }
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
