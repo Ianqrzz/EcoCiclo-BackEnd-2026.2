@@ -8,21 +8,18 @@ import br.com.ifba.ecociclo.modulos.coletor.model.Coletor;
 import br.com.ifba.ecociclo.modulos.doacao.model.Doacao;
 import br.com.ifba.ecociclo.modulos.doador.model.Doador;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "tb_agendamentos")
-@Data
+@Getter
+@Setter
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
 public class Agendamento extends PersistenceEntity {
 
     private LocalDateTime dataColeta;

@@ -3,21 +3,18 @@ package br.com.ifba.ecociclo.modulos.avaliacao.model;
 import br.com.ifba.ecociclo.infraestructure.model.PersistenceEntity;
 import br.com.ifba.ecociclo.modulos.agendamento.model.Agendamento;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "tb_avaliacoes")
-@Data
+@Getter
+@Setter
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
 public class Avaliacao extends PersistenceEntity {
 
     @Column(nullable = false)
