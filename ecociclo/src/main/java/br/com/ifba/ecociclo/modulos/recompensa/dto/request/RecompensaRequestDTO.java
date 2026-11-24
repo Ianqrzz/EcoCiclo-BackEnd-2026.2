@@ -1,9 +1,11 @@
 package br.com.ifba.ecociclo.modulos.recompensa.dto.request;
 
+import jakarta.validation.constraints.Size;
+
 public record RecompensaRequestDTO(
-        String nome,
+        @Size(max = 120) String nome,
         Integer quantidade,
-        String imagem,
-        String descricao,
+        @Size(max = 2048) String imagem,
+        @Size(max = 2000) String descricao,
         Double custoPontos
 ) {}

@@ -7,6 +7,8 @@ import br.com.ifba.ecociclo.modulos.usuario.dto.request.UsuarioUpdateRequestDTO;
 import br.com.ifba.ecociclo.modulos.usuario.dto.response.UsuarioResponseDTO;
 import br.com.ifba.ecociclo.modulos.usuario.model.Usuario;
 import br.com.ifba.ecociclo.modulos.usuario.service.UsuarioService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +31,7 @@ public class UsuarioController {
 
     // --- NOVO ENDPOINT DE LOGIN ---
     @PostMapping("/login")
-    public ResponseEntity<?> efetuarLogin(@RequestBody AutenticacaoDTO dados) {
+    public ResponseEntity<?> efetuarLogin(@Valid @RequestBody AutenticacaoDTO dados) {
         try {
             var authenticationToken = new UsernamePasswordAuthenticationToken(dados.email(), dados.senha());
             var authentication = manager.authenticate(authenticationToken);
@@ -43,13 +45,13 @@ public class UsuarioController {
     }
 
     @PostMapping
-    public ResponseEntity<UsuarioResponseDTO> criar(@RequestBody CadastroRequestDTO dto) {
+    public ResponseEntity<UsuarioResponseDTO> criar(@Valid @RequestBody CadastroRequestDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(usuarioService.salvar(dto));
     }
 
     @PostMapping("/{id}/enderecos")
     public ResponseEntity<UsuarioResponseDTO> adicionarEndereco(@PathVariable UUID id,
-                                                                @RequestBody EnderecoRequestDTO dto) {
+                                                                @Valid @RequestBody EnderecoRequestDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(usuarioService.adicionarEndereco(id, dto));
     }
 
@@ -81,7 +83,7 @@ public class UsuarioController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UsuarioResponseDTO> atualizar(@PathVariable UUID id, @RequestBody UsuarioUpdateRequestDTO dto) {
+    public ResponseEntity<UsuarioResponseDTO> atualizar(@PathVariable UUID id, @Valid @RequestBody UsuarioUpdateRequestDTO dto) {
         return ResponseEntity.ok(usuarioService.atualizar(id, dto));
     }
 
@@ -94,5 +96,5 @@ public class UsuarioController {
 
 // --- DTOs auxiliares para o Login ---
 // Se preferir, você pode criar essas classes/records dentro do seu pacote 'dto' depois.
-record AutenticacaoDTO(String email, String senha) {}
+record AutenticacaoDTO(@Size(max = 180) String email, @Size(max = 100) String senha) {}
 record TokenResponseDTO(String token) {}

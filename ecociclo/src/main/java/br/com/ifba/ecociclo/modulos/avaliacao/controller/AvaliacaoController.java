@@ -3,6 +3,7 @@ package br.com.ifba.ecociclo.modulos.avaliacao.controller;
 import br.com.ifba.ecociclo.modulos.avaliacao.dto.request.AvaliacaoRequestDTO;
 import br.com.ifba.ecociclo.modulos.avaliacao.dto.response.AvaliacaoResponseDTO;
 import br.com.ifba.ecociclo.modulos.avaliacao.service.AvaliacaoService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,7 @@ public class AvaliacaoController {
     private final AvaliacaoService avaliacaoService;
 
     @PostMapping
-    public ResponseEntity<AvaliacaoResponseDTO> criar(@RequestBody AvaliacaoRequestDTO dto) {
+    public ResponseEntity<AvaliacaoResponseDTO> criar(@Valid @RequestBody AvaliacaoRequestDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(avaliacaoService.salvar(dto));
     }
 
@@ -36,7 +37,7 @@ public class AvaliacaoController {
 
     @PutMapping("/{id}")
     public ResponseEntity<AvaliacaoResponseDTO> atualizar(@PathVariable UUID id,
-                                                          @RequestBody AvaliacaoRequestDTO dto) {
+                                                          @Valid @RequestBody AvaliacaoRequestDTO dto) {
         return ResponseEntity.ok(avaliacaoService.atualizar(id, dto));
     }
 

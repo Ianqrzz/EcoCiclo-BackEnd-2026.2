@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/recompensas")
@@ -21,7 +22,7 @@ public class RecompensaController {
     private final RecompensaService recompensaService;
 
     @PostMapping
-    public ResponseEntity<RecompensaResponseDTO> cadastrar(@RequestBody RecompensaRequestDTO dto) {
+    public ResponseEntity<RecompensaResponseDTO> cadastrar(@Valid @RequestBody RecompensaRequestDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(recompensaService.salvar(dto));
     }
 
@@ -36,7 +37,7 @@ public class RecompensaController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<RecompensaResponseDTO> atualizar(@PathVariable UUID id, @RequestBody RecompensaRequestDTO dto) {
+    public ResponseEntity<RecompensaResponseDTO> atualizar(@PathVariable UUID id, @Valid @RequestBody RecompensaRequestDTO dto) {
         return ResponseEntity.ok(recompensaService.atualizar(id, dto));
     }
 

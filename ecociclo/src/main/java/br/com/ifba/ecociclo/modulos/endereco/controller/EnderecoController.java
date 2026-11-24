@@ -3,6 +3,7 @@ package br.com.ifba.ecociclo.modulos.endereco.controller;
 import br.com.ifba.ecociclo.modulos.endereco.dto.request.EnderecoRequestDTO;
 import br.com.ifba.ecociclo.modulos.endereco.dto.response.EnderecoResponseDTO;
 import br.com.ifba.ecociclo.modulos.endereco.service.EnderecoService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +20,7 @@ public class EnderecoController {
     private final EnderecoService enderecoService;
 
     @PostMapping
-    public ResponseEntity<EnderecoResponseDTO> criar(@RequestBody EnderecoRequestDTO dto) {
+    public ResponseEntity<EnderecoResponseDTO> criar(@Valid @RequestBody EnderecoRequestDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(enderecoService.salvar(dto));
     }
 
@@ -34,7 +35,10 @@ public class EnderecoController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<EnderecoResponseDTO> atualizar(@PathVariable UUID id, @RequestBody EnderecoRequestDTO dto) {
+    public ResponseEntity<EnderecoResponseDTO> atualizar(
+            @PathVariable UUID id,
+            @Valid @RequestBody EnderecoRequestDTO dto
+    ) {
         return ResponseEntity.ok(enderecoService.atualizar(id, dto));
     }
 

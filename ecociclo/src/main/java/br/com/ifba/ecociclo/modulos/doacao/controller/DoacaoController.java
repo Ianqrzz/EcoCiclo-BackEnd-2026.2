@@ -3,6 +3,7 @@ package br.com.ifba.ecociclo.modulos.doacao.controller;
 import br.com.ifba.ecociclo.modulos.doacao.dto.request.DoacaoRequestDTO;
 import br.com.ifba.ecociclo.modulos.doacao.dto.response.DoacaoResponseDTO;
 import br.com.ifba.ecociclo.modulos.doacao.service.DoacaoService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +20,7 @@ public class DoacaoController {
     private final DoacaoService doacaoService;
 
     @PostMapping
-    public ResponseEntity<DoacaoResponseDTO> cadastrar(@RequestBody DoacaoRequestDTO dto) {
+    public ResponseEntity<DoacaoResponseDTO> cadastrar(@Valid @RequestBody DoacaoRequestDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(doacaoService.salvar(dto));
     }
 
