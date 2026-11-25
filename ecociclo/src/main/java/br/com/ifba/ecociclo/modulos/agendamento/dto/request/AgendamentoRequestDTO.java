@@ -1,14 +1,16 @@
 package br.com.ifba.ecociclo.modulos.agendamento.dto.request;
 
+import br.com.ifba.ecociclo.modulos.doacao.dto.request.DoacaoRequestDTO;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Size;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
-
-import br.com.ifba.ecociclo.modulos.doacao.dto.request.DoacaoRequestDTO;
 
 public record AgendamentoRequestDTO(
         UUID doadorId,
         UUID enderecoId,
         LocalDateTime dataColeta,
-        String observacoes,
-        DoacaoRequestDTO doacao
+        @Size(max = 1000) String observacoes,
+        @Valid DoacaoRequestDTO doacao
 ) {}

@@ -4,6 +4,7 @@ import br.com.ifba.ecociclo.modulos.associacao.dto.request.AssociacaoRequestDTO;
 import br.com.ifba.ecociclo.modulos.associacao.dto.response.AssociacaoResponseDTO;
 import br.com.ifba.ecociclo.modulos.associacao.service.AssociacaoService;
 import br.com.ifba.ecociclo.modulos.usuario.dto.response.UsuarioResponseDTO;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +22,7 @@ public class AssociacaoController {
     private final AssociacaoService associacaoService;
 
     @PostMapping
-    public ResponseEntity<AssociacaoResponseDTO> criar(@RequestBody AssociacaoRequestDTO dto) {
+    public ResponseEntity<AssociacaoResponseDTO> criar(@Valid @RequestBody AssociacaoRequestDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(associacaoService.salvar(dto));
     }
 
@@ -37,7 +38,7 @@ public class AssociacaoController {
 
     @PutMapping("/{id}")
     public ResponseEntity<AssociacaoResponseDTO> atualizar(@PathVariable UUID id,
-                                                           @RequestBody AssociacaoRequestDTO dto) {
+                                                           @Valid @RequestBody AssociacaoRequestDTO dto) {
         return ResponseEntity.ok(associacaoService.atualizar(id, dto));
     }
 
