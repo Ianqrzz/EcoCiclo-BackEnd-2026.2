@@ -16,4 +16,7 @@ public interface AgendamentoRepository extends JpaRepository<Agendamento, UUID> 
     List<Agendamento> findByStatus(StatusAgendamento status);
 
     List<Agendamento> findByStatusAndColetor_Id(StatusAgendamento status, UUID coletorId);
+
+    // Encontra o agendamento ligado à doação.
+    java.util.Optional<Agendamento> findByDoacao_Id(UUID doacaoId);
 }

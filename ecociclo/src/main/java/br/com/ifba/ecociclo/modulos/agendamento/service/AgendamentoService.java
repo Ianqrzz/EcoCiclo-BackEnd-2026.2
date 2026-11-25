@@ -6,6 +6,7 @@ import br.com.ifba.ecociclo.modulos.agendamento.enums.StatusAgendamento;
 import br.com.ifba.ecociclo.modulos.agendamento.model.Agendamento;
 import br.com.ifba.ecociclo.modulos.agendamento.repository.AgendamentoRepository;
 import br.com.ifba.ecociclo.modulos.coletor.repository.ColetorRepository;
+import br.com.ifba.ecociclo.infraestructure.security.SecurityActor;
 import br.com.ifba.ecociclo.modulos.coletor.model.Coletor;
 import br.com.ifba.ecociclo.modulos.doacao.dto.response.DoacaoResponseDTO;
 import br.com.ifba.ecociclo.modulos.doador.model.Doador;
@@ -35,11 +36,16 @@ public class AgendamentoService {
 
     @Transactional
     public AgendamentoResponseDTO criarAgendamento(AgendamentoRequestDTO dto) {
+        SecurityActor.requireSelfOrAdmin(dto.doadorId());
         // Busca Doador e Endereco
         Doador doador = doadorRepository.findById(dto.doadorId())
                 .orElseThrow(() -> new RuntimeException("Doador não encontrado"));
         Endereco endereco = enderecoRepository.findById(dto.enderecoId())
                 .orElseThrow(() -> new RuntimeException("Endereço não encontrado"));
+        // O endereço precisa pertencer ao doador do agendamento.
+        if (endereco.getUsuario() == null || !endereco.getUsuario().getId().equals(doador.getId())) {
+            throw new org.springframework.security.access.AccessDeniedException("O endereço não pertence ao doador informado.");
+        }
         // Cria a Doação embarcada
         Doacao doacao = Doacao.builder()
                 .nome(dto.doacao().nome())
@@ -65,6 +71,7 @@ public class AgendamentoService {
 
     @Transactional
     public AgendamentoResponseDTO aceitarColeta(UUID agendamentoId, UUID coletorId) {
+        SecurityActor.requireSelfOrAdmin(coletorId);
         Agendamento agendamento = agendamentoRepository.findById(agendamentoId)
                 .orElseThrow(() -> new RuntimeException("Agendamento não encontrado"));
         if (agendamento.getStatus() != StatusAgendamento.PENDENTE) {
@@ -82,6 +89,7 @@ public class AgendamentoService {
     public AgendamentoResponseDTO concluirColeta(UUID agendamentoId) {
         Agendamento agendamento = agendamentoRepository.findById(agendamentoId)
                 .orElseThrow(() -> new RuntimeException("Agendamento não encontrado"));
+        SecurityActor.requireSelfOrAdmin(agendamento.getColetor() == null ? null : agendamento.getColetor().getId());
         if (agendamento.getStatus() != StatusAgendamento.CONFIRMADO) {
             throw new RuntimeException("Agendamento deve estar CONFIRMADO para ser concluído");
         }
@@ -102,6 +110,7 @@ public class AgendamentoService {
     public void cancelarAgendamento(UUID agendamentoId) {
         Agendamento agendamento = agendamentoRepository.findById(agendamentoId)
                 .orElseThrow(() -> new RuntimeException("Agendamento não encontrado"));
+        SecurityActor.requireSelfOrAdmin(agendamento.getDoador().getId());
         agendamento.setStatus(StatusAgendamento.CANCELADO);
         agendamentoRepository.save(agendamento);
     }
@@ -113,6 +122,7 @@ public class AgendamentoService {
 
     @Transactional
     public List<AgendamentoResponseDTO> listarPorColetor(UUID coletorId) {
+        SecurityActor.requireSelfOrAdmin(coletorId);
         if (coletorId == null) {
             throw new RuntimeException("Coletor não informado");
         }
@@ -123,6 +133,13 @@ public class AgendamentoService {
 
     @Transactional
     public List<AgendamentoResponseDTO> listarAgendamentos(StatusAgendamento status, UUID coletorId) {
+        // Apenas administradores podem consultar vários coletores.
+        if (SecurityActor.current().getPerfil().name().equals("ADMINISTRADOR")) {
+            // Administradores podem consultar vários coletores.
+        } else {
+            SecurityActor.requireSelfOrAdmin(coletorId);
+            if (coletorId == null) throw new org.springframework.security.access.AccessDeniedException("Filtro de coletor obrigatório.");
+        }
         List<Agendamento> agendamentos;
 
         if (status != null && coletorId != null) {
