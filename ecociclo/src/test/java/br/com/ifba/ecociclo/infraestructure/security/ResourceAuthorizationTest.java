@@ -16,6 +16,7 @@ import br.com.ifba.ecociclo.modulos.endereco.model.Endereco;
 import br.com.ifba.ecociclo.modulos.endereco.repository.EnderecoRepository;
 import br.com.ifba.ecociclo.modulos.endereco.service.EnderecoService;
 import br.com.ifba.ecociclo.modulos.recompensa.dto.request.RecompensaRequestDTO;
+import br.com.ifba.ecociclo.modulos.recompensa.model.Recompensa;
 import br.com.ifba.ecociclo.modulos.recompensa.repository.RecompensaRepository;
 import br.com.ifba.ecociclo.modulos.recompensa.service.RecompensaService;
 import br.com.ifba.ecociclo.modulos.resgate.model.Resgate;
@@ -40,8 +41,12 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.withSettings;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 
 class ResourceAuthorizationTest {
 
@@ -167,5 +172,80 @@ class ResourceAuthorizationTest {
         assertThrows(AccessDeniedException.class, () -> service.buscarPorId(otherId));
         assertThrows(AccessDeniedException.class, () -> service.atualizar(otherId, new UsuarioUpdateRequestDTO("Outro", "123")));
         assertThrows(AccessDeniedException.class, () -> service.deletar(otherId));
+    }
+
+    @Test
+    void administradoresConseguemUsarOperacoesProtegidas() {
+        when(actor.getPerfil()).thenReturn(TipoPerfil.ADMINISTRADOR);
+
+        AgendamentoRepository agendamentos = mock(AgendamentoRepository.class);
+        when(agendamentos.findAll()).thenReturn(java.util.List.of());
+        when(agendamentos.findByStatusAndColetor_Id(org.mockito.ArgumentMatchers.any(), any())).thenReturn(java.util.List.of());
+        AgendamentoService agendamentoService = new AgendamentoService(
+                agendamentos, mock(DoadorRepository.class), mock(EnderecoRepository.class),
+                mock(DoacaoRepository.class), mock(ColetorRepository.class));
+        agendamentoService.listarAgendamentos(null, null);
+
+        DoacaoRepository doacoes = mock(DoacaoRepository.class);
+        when(doacoes.save(any(Doacao.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(doacoes.findAll()).thenReturn(java.util.List.of());
+        when(doacoes.findById(ownerId)).thenReturn(Optional.of(mock(Doacao.class)));
+        DoacaoService doacaoService = new DoacaoService(doacoes, mock(AgendamentoRepository.class));
+        doacaoService.salvar(new DoacaoRequestDTO("Papel", 1, "", 1));
+        doacaoService.listarTodas();
+        doacaoService.buscarPorId(ownerId);
+
+        EnderecoRepository enderecos = mock(EnderecoRepository.class);
+        Endereco ownedAddress = mock(Endereco.class, withSettings().defaultAnswer(RETURNS_DEEP_STUBS));
+        when(ownedAddress.getUsuario().getId()).thenReturn(ownerId);
+        when(enderecos.findAll()).thenReturn(java.util.List.of());
+        when(enderecos.findById(ownerId)).thenReturn(Optional.of(ownedAddress));
+        when(enderecos.save(any(Endereco.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        EnderecoService enderecoService = new EnderecoService(enderecos, mock(UsuarioRepository.class));
+        enderecoService.listarTodos();
+        enderecoService.buscarPorId(ownerId);
+        enderecoService.atualizar(ownerId, new EnderecoRequestDTO("Rua", "Centro", "Irecê", "BA", "44900000", ownerId));
+        enderecoService.deletar(ownerId);
+
+        RecompensaRepository recompensas = mock(RecompensaRepository.class);
+        ResgateRepository resgates = mock(ResgateRepository.class);
+        Recompensa reward = mock(Recompensa.class);
+        when(reward.getId()).thenReturn(ownerId);
+        when(reward.getNome()).thenReturn("Caneca");
+        when(reward.getQuantidade()).thenReturn(1);
+        when(reward.getBloqueado()).thenReturn(0);
+        when(reward.getCustoPontos()).thenReturn(10.0);
+        when(reward.isDisponivel()).thenReturn(true);
+        when(recompensas.save(any(br.com.ifba.ecociclo.modulos.recompensa.model.Recompensa.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+        when(recompensas.findById(ownerId)).thenReturn(Optional.of(reward));
+        when(resgates.existsByRecompensaId(ownerId)).thenReturn(false);
+        RecompensaService recompensaService = new RecompensaService(recompensas, mock(DoadorRepository.class), resgates);
+        recompensaService.salvar(new RecompensaRequestDTO("Caneca", 1, "", "Caneca", 10.0));
+        recompensaService.atualizar(ownerId, new RecompensaRequestDTO(null, null, null, null, null));
+        recompensaService.deletar(ownerId);
+
+        UsuarioRepository usuarios = mock(UsuarioRepository.class);
+        when(usuarios.findAll()).thenReturn(java.util.List.of());
+        when(usuarios.findById(ownerId)).thenReturn(Optional.of(actor));
+        when(usuarios.save(any(Usuario.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(usuarios.existsById(ownerId)).thenReturn(true);
+        UsuarioService usuarioService = new UsuarioService(
+                mock(DoadorRepository.class), mock(ColetorRepository.class), mock(AdministradorRepository.class),
+                usuarios, mock(BCryptPasswordEncoder.class));
+        usuarioService.listarTodos();
+        usuarioService.buscarPorId(ownerId);
+        usuarioService.atualizar(ownerId, new UsuarioUpdateRequestDTO("Doador", "123"));
+        usuarioService.deletar(ownerId);
+
+        when(resgates.findAll()).thenReturn(java.util.List.of());
+        when(resgates.findByStatus(any())).thenReturn(java.util.List.of());
+        when(resgates.findByDoador_Id(ownerId)).thenReturn(java.util.List.of());
+        when(resgates.findByDoador_IdAndStatus(eq(ownerId), any())).thenReturn(java.util.List.of());
+        ResgateService resgateService = new ResgateService(resgates);
+        resgateService.listarTodos();
+        resgateService.listarPorStatus(null);
+        resgateService.listarPorDoador(ownerId);
+        resgateService.listarPorDoadorEStatus(ownerId, null);
     }
 }
